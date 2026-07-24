@@ -122,6 +122,9 @@ HTML = """
       <div class="score">คะแนน: {{ score }}/{{ total }}</div>
       {% if finished %}
         <div class="result">จบแล้ว! คะแนนของคุณคือ {{ score }}/{{ total }}</div>
+        {% if score < 2 %}
+          <div class="feedback wrong">คุณไม่ใช่แฟนพันธ์ุแท้อาหารไทย</div>
+        {% endif %}
         <form method="post" action="/">
           <button class="retry" type="submit" name="retry" value="1">ลองทำใหม่</button>
         </form>
@@ -162,6 +165,16 @@ def index():
 
     score = session.get('score', 0)
     question_index = session.get('question_index', 0)
+
+    if question_index >= len(QUESTIONS):
+        return render_template_string(
+            HTML,
+            score=score,
+            total=len(QUESTIONS),
+            finished=True,
+            current_question=None,
+            feedback=None,
+        )
 
     if request.method == 'GET':
         return render_template_string(
